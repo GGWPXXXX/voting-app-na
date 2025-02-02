@@ -2,8 +2,8 @@ version: "3.2"
 
 services:
   vote:
-    image: dockersamples/examplevotingapp_vote:dotnet-nanoserver-sac2016
-    build: 
+    image: dockersamples/examplevotingapp_vote:dotnet
+    build:
       context: ./vote/dotnet
     ports:
       - "5000:80"
@@ -11,33 +11,38 @@ services:
       - message-queue
 
   result:
-    image: dockersamples/examplevotingapp_result:dotnet-nanoserver-sac2016
-    build: 
+    image: dockersamples/examplevotingapp_result:dotnet
+    build:
       context: ./result/dotnet
     ports:
       - "5001:80"
-    environment:      
+    environment:
       - "ConnectionStrings:ResultData=Server=db;Port=4000;Database=votes;User=root;SslMode=None"
     depends_on:
       - db
 
   worker:
-    image: dockersamples/examplevotingapp_worker:dotnet-nanoserver-sac2016
+    image: dockersamples/examplevotingapp_worker:dotnet
     build:
       context: ./worker/dotnet
-    environment:      
+    environment:
       - "ConnectionStrings:VoteData=Server=db;Port=4000;Database=votes;User=root;SslMode=None"
     depends_on:
       - message-queue
       - db
 
   message-queue:
-    image: nats:nanoserver
+    image: nats:latest # Use the latest NATS image
+    ports:
+      - "4222:4222" # NATS default port
 
   db:
-    image: dockersamples/tidb:nanoserver    
+    image: mysql:5.7 # Use MySQL instead of TiDB for simplicity
     ports:
-      - "3306:4000"
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=votes
 
 networks:
   default:
