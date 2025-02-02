@@ -39,7 +39,7 @@ services:
   db:
     image: mysql:5.7 # Use MySQL instead of TiDB for simplicity
     ports:
-      - "3306:3306"
+      - "3308:3308"
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=votes
